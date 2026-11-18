@@ -19,7 +19,7 @@ The miss analysis traced v1's problems to split payments and rounding. v2 fixed 
 <p align="center"><i>Detection by exception type and false positive rate, v1 vs v2.</i></p>
 
 <p align="center"><img src="docs/images/dashboard.png" width="720"></p>
-<p align="center"><i>Exception rate by type, source system and week, with the biggest open exceptions first.</i></p>
+<p align="center"><i>The Power BI report: exception rate by type, source system and week, with the biggest open exceptions first.</i></p>
 
 ## How it works
 

@@ -16,5 +16,6 @@ python3 evaluate.py v2
 $PSQL -v tbl=recon_v2 -v out=results/miss_analysis_v2.csv -f sql/04_miss_analysis.sql
 
 $PSQL -f sql/05_powerbi_views.sql
+$PSQL -c "\\copy (select * from v_recon_bi order by status, week_start) to 'powerbi/v_recon_bi.csv' csv header"
 bash scripts/run_mainframe_local.sh
 python3 scripts/make_charts.py

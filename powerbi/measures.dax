@@ -1,32 +1,21 @@
-// measures on table v_recon
+// measures on table v_recon_bi (sql/05_powerbi_views.sql)
+// matched records are rolled up, so counts use record_count not COUNTROWS
 
 Total Records =
-COUNTROWS ( v_recon )
+SUM ( v_recon_bi[record_count] )
 
 Exception Count =
-CALCULATE ( COUNTROWS ( v_recon ), v_recon[status] = "EXCEPTION" )
+CALCULATE ( SUM ( v_recon_bi[record_count] ), v_recon_bi[status] = "EXCEPTION" )
+
+// card shows this one, the new card visual shortens numbers to 2K otherwise
+Exceptions =
+FORMAT ( [Exception Count], "#,0" )
 
 Exception Rate =
 DIVIDE ( [Exception Count], [Total Records] )
 
 $ At Risk =
-CALCULATE ( SUM ( v_recon[amount_cad] ), v_recon[status] = "EXCEPTION" )
+CALCULATE ( SUM ( v_recon_bi[amount_cad] ), v_recon_bi[status] = "EXCEPTION" )
 
 Open Exceptions =
-CALCULATE ( COUNTROWS ( v_recon ), v_recon[exception_status] = "Open" )
-
-Avg Exception Amount =
-DIVIDE ( [$ At Risk], [Exception Count] )
-
-// rank for the open exceptions table, biggest first
-Exception Rank =
-IF (
-    SELECTEDVALUE ( v_recon[status] ) = "EXCEPTION",
-    RANKX ( FILTER ( ALLSELECTED ( v_recon ), v_recon[status] = "EXCEPTION" ),
-            CALCULATE ( SUM ( v_recon[amount_cad] ) ), , DESC, DENSE )
-)
-
-Exceptions WoW % =
-VAR thisWeek = [Exception Count]
-VAR lastWeek = CALCULATE ( [Exception Count], DATEADD ( v_recon[week_start], -7, DAY ) )
-RETURN DIVIDE ( thisWeek - lastWeek, lastWeek )
+CALCULATE ( SUM ( v_recon_bi[record_count] ), v_recon_bi[exception_status] = "Open" )

@@ -1,12 +1,11 @@
 import os
 import pandas as pd
-import psycopg
+# dashboard.png is a screenshot of the real power bi report, not made here
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
 
-DSN = os.getenv("RECON_DSN", "postgresql://postgres:postgres@localhost:5432/recon")
 IMG = "docs/images"
 os.makedirs(IMG, exist_ok=True)
 plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 10, "axes.spines.top": False, "axes.spines.right": False})
@@ -59,51 +58,7 @@ def detection():
     plt.close(fig)
 
 
-def dashboard():
-    # preview of the same measures, the real one is built in power bi desktop
-    with psycopg.connect(DSN) as conn:
-        cur = conn.execute("select * from v_recon")
-        df = pd.DataFrame(cur.fetchall(), columns=[c.name for c in cur.description])
-    df["amount_cad"] = df.amount_cad.astype(float)
-    ex = df[df.status == "EXCEPTION"]
-
-    fig = plt.figure(figsize=(12, 6.5))
-    gs = fig.add_gridspec(3, 3, height_ratios=[0.55, 1.4, 1.4], hspace=0.6, wspace=0.35)
-    cards = [("Exception count", f"{len(ex):,}"), ("Exception rate", f"{len(ex) / len(df):.2%}"),
-             ("At risk (C\\$)", f"{ex.amount_cad.sum() / 1e6:,.1f}M")]
-    for i, (k, v) in enumerate(cards):
-        a = fig.add_subplot(gs[0, i]); a.axis("off")
-        a.add_patch(FancyBboxPatch((0, 0), 1, 1, boxstyle="round,pad=0.02", fc="#eef3fc", ec=BLUE, transform=a.transAxes))
-        a.text(0.5, 0.62, v, ha="center", va="center", fontsize=18, weight="bold", color=BLUE, transform=a.transAxes)
-        a.text(0.5, 0.22, k, ha="center", va="center", fontsize=10, transform=a.transAxes)
-
-    a = fig.add_subplot(gs[1, 0])
-    t = ex.exception_type.value_counts().sort_values()
-    a.barh([s.replace("_", " ") for s in t.index], t.values, color=BLUE); a.set_title("By type", fontsize=10)
-
-    a = fig.add_subplot(gs[1, 1])
-    s = ex.source_system.value_counts().sort_values()
-    a.barh(s.index, s.values, color=ORANGE); a.set_title("By source system", fontsize=10)
-
-    a = fig.add_subplot(gs[1, 2])
-    w = ex.groupby("week_start").size()
-    a.plot(pd.to_datetime(w.index), w.values, color=BLUE, marker="o", ms=3)
-    a.set_title("By week", fontsize=10); a.tick_params(axis="x", labelsize=7, rotation=30)
-
-    a = fig.add_subplot(gs[2, :]); a.axis("off")
-    top = ex.sort_values("amount_cad", ascending=False).head(6)
-    cells = [[r.payment_id, r.ledger, r.exception_type, r.counterparty[:22], r.reference, f"{r.amount_cad:,.2f}"] for r in top.itertuples()]
-    tb = a.table(cellText=cells, colLabels=["payment id", "ledger", "type", "counterparty", "reference", "amount C$"],
-                 loc="upper center", cellLoc="left")
-    tb.auto_set_font_size(False); tb.set_fontsize(8.5); tb.scale(1, 1.3)
-    a.set_title("Open exceptions, largest first", fontsize=10)
-    fig.suptitle("Reconciliation exceptions (v2 rules)", fontsize=13, weight="bold")
-    fig.savefig(f"{IMG}/dashboard.png", dpi=130, bbox_inches="tight")
-    plt.close(fig)
-
-
 if __name__ == "__main__":
     flow()
     detection()
-    dashboard()
     print("charts saved to", IMG)

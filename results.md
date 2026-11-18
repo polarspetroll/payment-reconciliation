@@ -73,4 +73,4 @@ Record level: 101,231 records compared, 0 with a different status. The only labe
 | Detection, FP rate, by type, by source | `evaluate.py v1` / `v2` -> `results/v*_summary.csv`, `v*_by_type.csv`, `v*_by_source.csv` |
 | Miss analysis | `sql/04_miss_analysis.sql` -> `results/miss_analysis_v1.csv`, `_v2.csv` |
 | COBOL vs SQL | `scripts/run_mainframe_local.sh` -> `results/cobol_vs_sql.md` |
-| Dashboard figures (1,583 exceptions, 1.56% of records, C$11.3M at risk) | view `v_recon` in `sql/05_powerbi_views.sql`, USD at a placeholder 1.37 |
+| Dashboard figures (1,583 exceptions, 1.56% of records, C$11.28M at risk) | Power BI report on `powerbi/v_recon_bi.csv` (view `v_recon_bi`), USD at a placeholder 1.37 |
