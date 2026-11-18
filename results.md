@@ -63,7 +63,9 @@ What it showed and what changed:
 
 Record level: 101,231 records compared, 0 with a different status. The only label difference is wrong *reference* pairs, which COBOL writes as UNMATCHED because the two halves have different references (see `mainframe/LAYOUT.md`).
 
-**Timing.** Local run with GnuCOBOL 3 + unix sort standing in for DFSORT: about 0.2 s for the COBOL step and under 0.3 s sort + match on all 101,231 records (`results/mainframe_local_report.txt`). IBM Z elapsed and CPU time: _fill in from the JES job log after running on IBM Z Xplore_ (steps in `docs/runbook.md`).
+**IBM Z run (Z Xplore, z/OS 2.5, Enterprise COBOL).** Job RECONZX (JOB05023) ended RC=0000. Started 11:12:32, ended 11:12:35, so about 3 seconds elapsed for all 101,231 records. RECON step CPU 0.08 s. The z/OS totals report shows the same counts as SQL v2: 51,402 / 49,829 read, 50,530 matched bank lines, 565 UNMATCHED-A, 404 UNMATCHED-B, 614 MISMATCH. Full job log: `results/zos/RECONZX_job_log.txt`.
+
+Z Xplore caps user datasets at 200 KB and the ledgers are 5 MB each, so on Z Xplore the ledgers and outputs are z/OS UNIX files in the home directory and step 1 sorts them with the z/OS UNIX sort (DFSORT cant read UNIX files). That version is `mainframe/RECONZX.jcl`. `mainframe/RECONJOB.jcl` is the normal DFSORT + dataset version for a system without the cap. Local GnuCOBOL check: about 0.2 s (`results/mainframe_local_report.txt`).
 
 ## Where each number comes from
 
