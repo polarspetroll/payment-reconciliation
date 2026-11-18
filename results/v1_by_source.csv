@@ -1,0 +1,5 @@
+source_system,exceptions,caught,flagged,false_positives,detection_pct,fp_rate_pct
+Card,309,278,3116,2746,89.97,88.13
+Cheque,166,144,1866,1674,86.75,89.71
+EFT,525,487,5380,4704,92.76,87.43
+Wire,200,183,1846,1588,91.5,86.02

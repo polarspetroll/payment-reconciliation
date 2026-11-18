@@ -1,0 +1,6 @@
+type,exceptions,caught,classified,detection_pct,classified_pct
+amount_mismatch,250,248,0,99.2,0.0
+duplicate,300,195,0,65.0,0.0
+missing_in_a,250,250,0,100.0,0.0
+missing_in_b,250,250,0,100.0,0.0
+wrong_cpty_ref,150,149,0,99.33,0.0

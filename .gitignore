@@ -1,0 +1,5 @@
+data/*.csv
+mainframe/work/
+__pycache__/
+.venv/
+*.pyc

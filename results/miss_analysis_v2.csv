@@ -1,0 +1,4 @@
+kind,cause,records,exceptions,pct_of_kind
+missed exception,rounding,48,24,100.0
+false positive,split payment,20,0,83.3
+false positive,rounding,4,0,16.7

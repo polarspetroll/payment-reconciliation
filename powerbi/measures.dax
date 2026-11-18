@@ -1,0 +1,32 @@
+// measures on table v_recon
+
+Total Records =
+COUNTROWS ( v_recon )
+
+Exception Count =
+CALCULATE ( COUNTROWS ( v_recon ), v_recon[status] = "EXCEPTION" )
+
+Exception Rate =
+DIVIDE ( [Exception Count], [Total Records] )
+
+$ At Risk =
+CALCULATE ( SUM ( v_recon[amount_cad] ), v_recon[status] = "EXCEPTION" )
+
+Open Exceptions =
+CALCULATE ( COUNTROWS ( v_recon ), v_recon[exception_status] = "Open" )
+
+Avg Exception Amount =
+DIVIDE ( [$ At Risk], [Exception Count] )
+
+// rank for the open exceptions table, biggest first
+Exception Rank =
+IF (
+    SELECTEDVALUE ( v_recon[status] ) = "EXCEPTION",
+    RANKX ( FILTER ( ALLSELECTED ( v_recon ), v_recon[status] = "EXCEPTION" ),
+            CALCULATE ( SUM ( v_recon[amount_cad] ) ), , DESC, DENSE )
+)
+
+Exceptions WoW % =
+VAR thisWeek = [Exception Count]
+VAR lastWeek = CALCULATE ( [Exception Count], DATEADD ( v_recon[week_start], -7, DAY ) )
+RETURN DIVIDE ( thisWeek - lastWeek, lastWeek )
