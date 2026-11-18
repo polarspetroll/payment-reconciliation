@@ -12,6 +12,7 @@ A pipeline that matches 50,000 payments between a bank ledger and an ERP ledger,
 | Planted exceptions caught (of 1,200) | 91.0% | 98.0% |
 | False positive rate | 87.8% | 1.5% |
 | COBOL output = SQL output | | yes, 0 of 101,231 records differ |
+| IBM Z batch run (Z Xplore) | | all 101,231 records in about 3 s, RC=0000 |
 
 The miss analysis traced v1's problems to split payments and rounding. v2 fixed both. Details in [results.md](results.md).
 
@@ -26,14 +27,14 @@ The miss analysis traced v1's problems to split payments and rounding. v2 fixed 
 1. `generate.py` makes both ledgers with realistic noise (late posting, FX rounding, split payments) and plants exactly 1,200 problems such as duplicates, missing records and amount mismatches.
 2. SQL rules in PostgreSQL match the two sides. v2 adds a cent tolerance, a proper split rule and a duplicate check.
 3. `evaluate.py` scores each version against the answer key, and a miss analysis query groups every miss by cause.
-4. The v2 rules also run as a COBOL/JCL batch job (DFSORT, then one pass over both files) for IBM Z.
+4. The v2 rules also run as a COBOL/JCL batch job on IBM Z (sort, then one pass over both files), tested on IBM Z Xplore.
 
 ## How to run
 
 1. `pip install -r requirements.txt` and `docker compose up -d` (PostgreSQL 16)
 2. `./run_all.sh` runs everything: data, both rule versions, scoring, COBOL check, charts
 3. Check `results/` and [results.md](results.md)
-4. IBM Z: follow [docs/runbook.md](docs/runbook.md) (Zowe CLI upload, then submit the JCL)
+4. IBM Z: `bash scripts/run_zos.sh` with Zowe CLI, details in [docs/runbook.md](docs/runbook.md)
 5. Power BI: steps in [powerbi/README.md](powerbi/README.md)
 
 ## What I learned

@@ -32,6 +32,8 @@ zowe zos-jobs submit local-file mainframe/RECONJOB.jcl --view-all-spool-content
 ```
 Replace `Z00000` with your userid. The CLEANUP step deletes the old outputs so the job can be resubmitted as is. Elapsed and CPU time per step are in the JES2 job log (`JESMSGLG`, look for the IEF032I/IEF033I step end messages).
 
+On IBM Z Xplore user datasets are capped at 200 KB and must be allocated in TRK, so the 5 MB ledgers do not fit in a dataset. Use `bash scripts/run_zos.sh` instead: it allocates small CBL/CPY/LOAD libraries with `mainframe/ALLOC.jcl`, uploads the ledgers as z/OS UNIX files to your home directory and submits `mainframe/RECONZX.jcl` (z/OS UNIX sort + RECON reading the UNIX files with FILEDATA=TEXT). Change `/z/z68330` in RECONZX.jcl to your own id. A dataset allocation message `ZXP SAYS NO` means you hit that cap.
+
 Local test without a mainframe: `bash scripts/run_mainframe_local.sh` (GnuCOBOL + unix sort). It also checks the COBOL output against SQL v2, file by file and record by record (`results/cobol_vs_sql.md`).
 
 ## Common abends
